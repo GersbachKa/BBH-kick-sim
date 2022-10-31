@@ -1,6 +1,8 @@
 # BBH-population-kicks
 The final project for Astr8020 for Kyle and Levi
 
+Link to paper draft: https://www.overleaf.com/read/qdtkhqfzjdmx
+
 # Research question
 
 Given that we know black hole mergers can often lead to a velocity 'kick' after the merger, we want to know how important this effect is when it comes 
