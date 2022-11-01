@@ -31,11 +31,15 @@ To tie this back to LIGO, we can use the rates of BBH mergers as a way to change
 - [Gravitational Wave Recoil and the Retention of Intermediate-Mass Black Holes](https://iopscience.iop.org/article/10.1086/591218)
 This does almost everything we plan to do, though much more analytical/mathematical than what we intend to do.
 
-- [surfinBH: Surrogate final black hole properties for mergers of binary black holes](https://ui.adsabs.harvard.edu/abs/2018ascl.soft09007V/abstract)
+- [surfinBH: Surrogate final black hole properties for mergers of binary black holes](https://ui.adsabs.harvard.edu/abs/2018ascl.soft09007V/abstract) The Handy python package for mergers!
+
+- [Remnant mass, spin, and recoil from spin aligned black-hole binaries](https://journals.aps.org/prd/abstract/10.1103/PhysRevD.90.104004) Black hole kick formula!
+
+- [Properties and Astrophysical Implications of the 150 M⊙ Binary Black Hole Merger GW190521](https://iopscience.iop.org/article/10.3847/2041-8213/aba493&lang=en) Could be useful when relating our results
 
 - [SPIN-PRECESSION: BREAKING THE BLACK HOLE–NEUTRON STAR DEGENERACY](https://iopscience.iop.org/article/10.1088/2041-8205/798/1/L17)
 - [Cosmological Black Hole Spin Evolution by Mergers and Accretion](https://iopscience.iop.org/article/10.1086/590379/meta)
-These might be helpful when deriving initial spin parameter distributions
+These two might be helpful when deriving initial spin parameter distributions
 
 - [Global Stellar Budget for LIGO Black Holes](https://ui.adsabs.harvard.edu/abs/2020ApJ...889L..35J/abstract)
 Helpful for black hole formation and merger rates
