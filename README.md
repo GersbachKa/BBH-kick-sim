@@ -31,6 +31,8 @@ To tie this back to LIGO, we can use the rates of BBH mergers as a way to change
 - [Gravitational Wave Recoil and the Retention of Intermediate-Mass Black Holes](https://iopscience.iop.org/article/10.1086/591218)
 This does almost everything we plan to do, though much more analytical/mathematical than what we intend to do.
 
+-[surfinBH: Surrogate final black hole properties for mergers of binary black holes](https://ui.adsabs.harvard.edu/abs/2018ascl.soft09007V/abstract)
+
 - [SPIN-PRECESSION: BREAKING THE BLACK HOLE–NEUTRON STAR DEGENERACY](https://iopscience.iop.org/article/10.1088/2041-8205/798/1/L17)
 - [Cosmological Black Hole Spin Evolution by Mergers and Accretion](https://iopscience.iop.org/article/10.1086/590379/meta)
 These might be helpful when deriving initial spin parameter distributions
