@@ -17,15 +17,13 @@ class Simulator:
         Params needs the following parameters, if any are left as none, defaults are provided
         
         cluster_mass - The total mass of the globular cluster in solar masses [1e6]
-        cluster_radius - The total radius of the cluster in (parsecs?) []
+        radius - The radius where the BH collisions happen in parsecs [2]
         imf_alpha - The alpha value for the imf dn/dm = m**(-alpha) [2.35] 
         min_bh_star - Minimum mass of a star that forms a black hole in solar masses [10]
         bh_mass_frac - The fraction of the star mass that remains in the black hole [0.5]
         min_star - The smallest star mass in the cluster in solar masses [0.8]
         max_star - The largest star mass in the cluster in solar masses [100]
-        
-        sbh_fitter - The fitter for surfinBH to use ['NRSur7dq4Remnant']
-        
+         
         vel_thresh - Threshold velocity to allow a collision of black holes
         '''
         if params==None:
@@ -36,12 +34,12 @@ class Simulator:
             pars.update({'cluster_mass':1e6})
             if print_missing:
                 print(f"'cluster_mass' not set, defaulting to {pars['cluster_mass']}")
-        if 'cluster_radius' not in params.keys():
-            pars.update({'cluster_radius':1e6})
+        if 'radius' not in params.keys():
+            pars.update({'radius':2})
             if print_missing:
-                print(f"'cluster_radius' not set, defaulting to {pars['cluster_radius']}")
+                print(f"'radius' not set, defaulting to {pars['radius']}")
         if 'imf_alpha' not in params.keys():
-            pars.update({'imf_alpha':2.25})
+            pars.update({'imf_alpha':2.35})
             if print_missing:
                 print(f"'imf_alpha' not set, defaulting to {pars['imf_alpha']}")
         if 'min_bh_star' not in params.keys():
@@ -61,12 +59,8 @@ class Simulator:
             if print_missing:
                 print(f"'max_star' not set, defaulting to {pars['max_star']}")
             
-        if 'sbh_fitter' not in params.keys():
-            pars.update({'sbh_fitter':'NRSur7dq4Remnant'})
-            if print_missing:
-                print(f"'sbh_fitter' not set, defaulting to {pars['sbh_fitter']}")
         if 'vel_thresh' not in params.keys():
-            pars.update({'vel_thresh':1})
+            pars.update({'vel_thresh':0.1})
             if print_missing:
                 print(f"'vel_thresh' not set, defaulting to {pars['vel_thresh']}")
             
@@ -79,7 +73,7 @@ class Simulator:
         self.rng = np.random.default_rng(self.seed)
         
         
-        self.GC = GlobularCluster(pars['cluster_mass'],pars['cluster_radius'],pars['imf_alpha'],
+        self.GC = GlobularCluster(pars['cluster_mass'],pars['radius'],pars['imf_alpha'],
                                   pars['min_bh_star'],pars['bh_mass_frac'],
                                   pars['min_star'],pars['max_star']
                                  )
@@ -88,7 +82,8 @@ class Simulator:
                                  pars['bh_mass_frac'],pars['max_star'])
         
         
-        self.fit = surfinBH.LoadFits(pars['sbh_fitter'])
+        self.fit  = surfinBH.LoadFits('NRSur7dq4Remnant')
+        self.fit2 = surfinBH.LoadFits('NRSur3dq8Remnant') #Used only with high q
         
         self.v_thresh = pars['vel_thresh']
         
@@ -106,6 +101,9 @@ class Simulator:
             stopTime=float(np.inf)
             print('No stop time specified, Running until 1 or 0 black holes remain')
         
+        #Sort by mass first (As high mass are first to die)
+        self.sort_by_m_mass()
+        
         col_count = 0
         init_BH = len(self.GC.BHs)
         while(len(self.GC.BHs)>1):
@@ -113,10 +111,9 @@ class Simulator:
                 print(f'{len(self.GC.BHs)}/{init_BH} remaining')
                 col_count=0
             
+            #sort the list!
+            self.sort_by_time()
             if self.GC.BHs[0].t < stopTime:
-                #sort the list!
-                self.sort_by_time()
-            
                 #Take first two black holes
                 bh1 = self.GC.remove_BH(0)
                 bh2 = self.GC.remove_BH(0)
@@ -138,7 +135,7 @@ class Simulator:
     def time_evolve(self,bh):
         #TODO: Include dynamical friction here
         #For now, just decrease velocity linearly
-        a = -0.01
+        a = -0.0001
         totV = np.sum(np.square(bh.v)) #Get velocity magnitude
         
         t = (totV - self.v_thresh)/a
@@ -155,21 +152,34 @@ class Simulator:
         
         if bh1.m>=bh2.m:
             q = bh1.m/bh2.m
-            s1 = bh1.s
-            s2 = bh2.s
+            s1 = bh1.s_mag * self._random_uniform_sphere()
+            s2 = bh2.s_mag * self._random_uniform_sphere()
         else:
             q = bh2.m/bh1.m
-            s1 = bh2.s
-            s2 = bh1.s
-            
-        #TODO: Use surfinBH here
-        #For now, just add masses, and make velocity a random number
-        return mtot,s1,self.rng.random()*100,t
+            s1 = bh2.s_mag * self._random_uniform_sphere()
+            s2 = bh1.s_mag * self._random_uniform_sphere()
+        
+        if q<6:
+            mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2)
+        else:
+            #BIG mass ratio, use emergency fitter
+            import warnings
+            warnings.filterwarnings('ignore')
+            print(q)
+            s1 = np.sum(np.square(s1))*np.array([0,0,1])
+            s2 = np.sum(np.square(s2))*np.array([0,0,1])
+            mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2)
+        mf *= mtot
+        vf *= 3e5
+        return mf,chif,vf,t
     
     
     def sort_by_time(self):
         '''Sort the Black holes by the time'''
         self.GC.BHs.sort(key=lambda b: b.t)
+        
+    def sort_by_m_mass(self):
+        self.GC.BHs.sort(key=lambda b: -b.m)
     
     
     def add_random_BH(self):

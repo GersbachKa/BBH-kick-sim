@@ -10,6 +10,7 @@ class GlobularCluster:
     def __init__(self,mass,radius,
                  imf_alpha=2.35,min_bh_star=10,bh_mass_frac=0.5,
                  min_star=0.8,max_star=100):
+        ''''''
 
         #IMF and BH information (For N_BH calculation)
         self.imf_alpha = imf_alpha
@@ -22,10 +23,12 @@ class GlobularCluster:
              
         #Set total mass and radius of the globular cluster
         self.mass = mass #GC_mass must be in solar masses
-        self.radius = radius
+        self.radius = radius * 3.086e16 #Radius in PC. Convert to m
         
         #Calculate escape velocity
-        self.v_esc = np.sqrt((2*6.67430e11*self.mass)/self.radius) #* () #Extra factor for m/s -> km/s
+        G = 6.6743e-11
+        m_sun = 2e30
+        self.v_esc = np.sqrt((2*G*self.mass*m_sun)/self.radius) *(1e-3) #Extra factor for m/s -> km/s
         
         self.Nbh = self._calculateNbh()
         self.BHs = []
