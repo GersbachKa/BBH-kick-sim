@@ -55,11 +55,14 @@ class GlobularCluster:
             #Still in system
             eject = False
             self.BHs.append(bh)
+            if ret:
+                return self.BHs[-1], eject
         else:
             eject = True
             self.ejected.append(bh)
-        if ret:
-            return self.BHs[-1], eject
+            if ret:
+                return self.ejected[-1], eject
+        
         
     def remove_BH(self,index):
         return self.BHs.pop(index)

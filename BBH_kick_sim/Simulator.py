@@ -93,7 +93,7 @@ class Simulator:
         print(f'Setup complete, Globular Cluster now has {len(self.GC.BHs)} black holes.')
          
     
-    def begin_sim(self,stopTime=None,progress=1000):
+    def begin_sim(self,stopTime=None,progress=1000,sort_mass_first=True):
         '''If stopTime==None, Run until one BH left'''
         cputime_s = time.time()
         
@@ -102,18 +102,18 @@ class Simulator:
             print('No stop time specified, Running until 1 or 0 black holes remain')
         
         #Sort by mass first (As high mass are first to die)
-        self.sort_by_m_mass()
+        if sort_mass_first:
+            self.sort_by_m_mass()
         
         col_count = 0
         init_BH = len(self.GC.BHs)
         while(len(self.GC.BHs)>1):
-            if col_count==progress:
+            if col_count%progress==0:
                 print(f'{len(self.GC.BHs)}/{init_BH} remaining')
-                col_count=0
             
             #sort the list!
             self.sort_by_time()
-            if self.GC.BHs[0].t < stopTime:
+            if self.GC.BHs[1].t < stopTime:
                 #Take first two black holes
                 bh1 = self.GC.remove_BH(0)
                 bh2 = self.GC.remove_BH(0)
@@ -163,9 +163,7 @@ class Simulator:
             mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2)
         else:
             #BIG mass ratio, use emergency fitter
-            import warnings
-            warnings.filterwarnings('ignore')
-            print(q)
+            print(f'Large mass ratio encountered: q={q}')
             s1 = np.sum(np.square(s1))*np.array([0,0,1])
             s2 = np.sum(np.square(s2))*np.array([0,0,1])
             mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2)
