@@ -161,11 +161,15 @@ class Simulator:
         if bh1.m>=bh2.m:
             q = bh1.m/bh2.m
             s1 = bh1.s_mag * self._random_uniform_sphere()
+            bh1.s = s1
             s2 = bh2.s_mag * self._random_uniform_sphere()
+            bh2.s = s2
         else:
             q = bh2.m/bh1.m
             s1 = bh2.s_mag * self._random_uniform_sphere()
+            bh2.s=s1
             s2 = bh1.s_mag * self._random_uniform_sphere()
+            bh1.s=s2
         
         if q<6:
             mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2)
