@@ -24,7 +24,8 @@ class Simulator:
         min_star - The smallest star mass in the cluster in solar masses [0.8]
         max_star - The largest star mass in the cluster in solar masses [100]
          
-        vel_thresh - Threshold velocity to allow a collision of black holes
+        vel_thresh - Threshold velocity to allow a collision of black holes [0.1]
+        rand_spin_type - The type of random for the random spin generator [uniform]
         '''
         if params==None:
             params = dict()
@@ -63,6 +64,11 @@ class Simulator:
             pars.update({'vel_thresh':0.1})
             if print_missing:
                 print(f"'vel_thresh' not set, defaulting to {pars['vel_thresh']}")
+        if 'rand_spin_type' not in params.keys():
+            pars.update({'rand_spin_type':'uniform'})
+            if print_missing:
+                print(f"'rand_spin_type' not set, defaulting to {pars['rand_spin_type']}")
+            
             
             
         if rand_seed==None:
@@ -86,6 +92,8 @@ class Simulator:
         self.fit2 = surfinBH.LoadFits('NRSur3dq8Remnant') #Used only with high q
         
         self.v_thresh = pars['vel_thresh']
+        
+        self.rand_spin_type = pars['rand_spin_type']
         
         for i in range(self.GC.Nbh):
             self.add_random_BH()
@@ -194,9 +202,12 @@ class Simulator:
         return self._mass_transform(self.rng.random())
       
         
-    def random_spin(self,rand_type='uniform'):
+    def random_spin(self):
         '''SurfinBH works best with spin [0,0.8) but works 'well' up to 1'''
-        return self.rng.random()*(0.9-0) * self._random_uniform_sphere()
+        if self.rand_spin_type=='uniform':
+            return self.rng.random()*(0.9-0) * self._random_uniform_sphere()
+        elif self.rand_spin_type=='zero':
+            return 0 * self._random_uniform_sphere()
     
     
     def _set_mass_transform(self,imf,min_bh_star,bh_mass_frac,max_star):
