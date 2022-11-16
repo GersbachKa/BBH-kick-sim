@@ -32,9 +32,28 @@ class BlackHole:
         return n
     
     def __str__(self):
-        BH = f'[M:{round(self.m,3)},S_mag:{round(self.s_mag,3)},'
+        BH = f'[M:{round(self.m,6)},S_mag:{round(self.s_mag,3)},'
         BH+= f'v_mag:{round(np.sqrt(np.sum(np.square(self.v))),3)},'
         BH+= f'v_imag:{round(np.sqrt(np.sum(np.square(self.v_i))),3)},'
-        BH+= f't:{round(self.t,3)},t_i:{round(self.t_i,3)},'
-        BH+= f'n_parents:{self.n_parents()}]'
+        BH+= f't:{round(self.t,3)},t_i:{round(self.t_i,3)}]'
         return BH
+    
+    def printTree(self):
+        from treelib import Node, Tree
+        
+        def _makeNode(tree,BH,final):
+            parents = BH.parents
+            #Make Current node, then add nodes for each
+            if final!=None:
+                tree.create_node(BH,BH.__str__(),parent=final.__str__(),data=BH)
+            else:
+                tree.create_node(BH,BH.__str__(),parent=None,data=BH)
+            if parents[0]!=None:
+                _makeNode(tree,parents[0],BH)
+                _makeNode(tree,parents[1],BH)
+        
+        tree = Tree()
+        _makeNode(tree,self,None)
+        tree.show(key=lambda node: -node.data.m)
+
+        
