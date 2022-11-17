@@ -98,6 +98,7 @@ class Simulator:
         for i in range(self.GC.Nbh):
             self.add_random_BH()
             
+        self.collide_ratios = []
         print(f'Setup complete, Globular Cluster now has {len(self.GC.BHs)} black holes.')
          
     
@@ -144,11 +145,16 @@ class Simulator:
         #TODO: Include dynamical friction here
         #For now, just decrease velocity linearly
         a = -0.0001
-        totV = np.sum(np.square(bh.v)) #Get velocity magnitude
+        totV = np.sqrt(np.sum(np.square(bh.v))) #Get velocity magnitude
         
-        t = (totV - self.v_thresh)/a
-        bh.t+=t
-        bh.v = self.v_thresh 
+        if self.v_thresh<totV:
+            t = (self.v_thresh-totV)/a
+            print(t)
+            bh.t+=t
+            bh.v = self.v_thresh 
+        else:
+            pass
+            #No need to decrease speed! Already at treshold!
        
         
     def collideBH(self,bh1,bh2):
@@ -176,11 +182,12 @@ class Simulator:
         else:
             #BIG mass ratio, use emergency fitter
             #print(f'Large mass ratio encountered: q={q}')
-            s1 = np.sum(np.square(s1))*np.array([0,0,1])
-            s2 = np.sum(np.square(s2))*np.array([0,0,1])
+            s1 = np.sqrt(np.sum(np.square(s1)))*np.array([0,0,1])
+            s2 = np.sqrt(np.sum(np.square(s2)))*np.array([0,0,1])
             mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2,allow_extrap=True)
         mf *= mtot
         vf *= 3e5
+        self.collide_ratios.append(q)
         return mf,chif,vf,t
     
     
