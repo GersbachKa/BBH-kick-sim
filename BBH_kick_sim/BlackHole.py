@@ -11,7 +11,7 @@ class BlackHole:
         self.m = mass #Solar masses
         
         self.s = spin #Unitless spin
-        self.s_mag = np.sum(np.square(spin))
+        self.s_mag = np.sqrt(np.sum(np.square(spin)))
         #self.s_i = spin #Does spin evolve over time?
         
         self.v = velocity #Km/s

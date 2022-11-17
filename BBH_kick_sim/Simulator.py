@@ -171,14 +171,14 @@ class Simulator:
             s2 = bh1.s_mag * self._random_uniform_sphere()
             bh1.s=s2
         
-        if q<6:
-            mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2)
+        if q<8:
+            mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2,allow_extrap=True)
         else:
             #BIG mass ratio, use emergency fitter
-            print(f'Large mass ratio encountered: q={q}')
+            #print(f'Large mass ratio encountered: q={q}')
             s1 = np.sum(np.square(s1))*np.array([0,0,1])
             s2 = np.sum(np.square(s2))*np.array([0,0,1])
-            mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2)
+            mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2,allow_extrap=True)
         mf *= mtot
         vf *= 3e5
         return mf,chif,vf,t
