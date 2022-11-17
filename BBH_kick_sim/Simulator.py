@@ -149,7 +149,6 @@ class Simulator:
         
         if self.v_thresh<totV:
             t = (self.v_thresh-totV)/a
-            print(t)
             bh.t+=t
             bh.v = self.v_thresh 
         else:
