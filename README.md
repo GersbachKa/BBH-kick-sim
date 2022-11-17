@@ -50,5 +50,4 @@ Explores mass ratio 2 and highly misaligned spin mergers and resulting recoil
 - [Binary black hole mergers from globular clusters: Masses, merger rates, and the impact of stellar evolution](https://journals.aps.org/prd/pdf/10.1103/PhysRevD.93.084029)
 Similar study to ours but more extensive globular cluster modeling from 2016 using very few GW events.
 
-
-
+- [Very massive stars, pair-instability supernovae and intermediate-mass black holes with the SEVN code](https://academic.oup.com/mnras/article/470/4/4739/3883764#93923623)
