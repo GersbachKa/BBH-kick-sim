@@ -49,8 +49,8 @@ class GlobularCluster:
         return int(Nbh)
     
     
-    def add_BH(self,mass,spin,velocity,time,bh1=None,bh2=None,ret=False):
-        bh = BlackHole(mass,spin,velocity,time,bh1,bh2)
+    def add_BH(self,mass,spin,velocity,time,bh1=None,bh2=None,id=None,ret=False):
+        bh = BlackHole(mass,spin,velocity,time,bh1,bh2,id)
         if np.sqrt(np.sum(np.square(velocity))) < self.v_esc:
             #Still in system
             eject = False

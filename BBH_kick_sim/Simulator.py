@@ -69,7 +69,7 @@ class Simulator:
             if print_missing:
                 print(f"'rand_spin_type' not set, defaulting to {pars['rand_spin_type']}")
             
-            
+        self.sim_params = pars
             
         if rand_seed==None:
             self.seed = np.random.randint(0,1_000_000_000)
@@ -96,13 +96,13 @@ class Simulator:
         self.rand_spin_type = pars['rand_spin_type']
         
         for i in range(self.GC.Nbh):
-            self.add_random_BH()
+            self.add_random_BH(id=str(i))
             
         self.collide_ratios = []
         print(f'Setup complete, Globular Cluster now has {len(self.GC.BHs)} black holes.')
          
     
-    def begin_sim(self,stopTime=None,progress=1000,sort_mass_first=True):
+    def begin_sim(self,stopTime=None,progress=1000,sort_mass_first=False):
         '''If stopTime==None, Run until one BH left'''
         cputime_s = time.time()
         
@@ -131,7 +131,7 @@ class Simulator:
                 mf,sf,vf,t = self.collideBH(bh1,bh2)
             
                 #GC will check for ejected black holes,
-                BHf, ejected = self.GC.add_BH(mf,sf,vf,t,bh1=bh1,bh2=bh2,ret=True)
+                BHf, ejected = self.GC.add_BH(mf,sf,vf,t,bh1=bh1,bh2=bh2,ret=True,id=bh1.id+'+'+bh2.id)
             
                 if not ejected:
                     #Time evolve the final BH to threshold velocity
@@ -176,10 +176,10 @@ class Simulator:
             s2 = bh1.s_mag * self._random_uniform_sphere()
             bh1.s=s2
         
-        if q<8:
+        if q<6:
             mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2,allow_extrap=True)
         else:
-            #BIG mass ratio, use emergency fitter
+            #big mass ratio, use emergency fitter
             #print(f'Large mass ratio encountered: q={q}')
             s1 = np.sqrt(np.sum(np.square(s1)))*np.array([0,0,1])
             s2 = np.sqrt(np.sum(np.square(s2)))*np.array([0,0,1])
@@ -198,14 +198,14 @@ class Simulator:
         self.GC.BHs.sort(key=lambda b: -b.m)
     
     
-    def add_random_BH(self):
+    def add_random_BH(self,id=None):
         '''Make a random BH to add to the GC. Starts at time 0 with 0 velocity'''
         m = self.random_mass()
         s = self.random_spin()
         v = 0
         t = 0
         
-        return self.GC.add_BH(m,s,v,t,bh1=None,bh2=None)
+        return self.GC.add_BH(m,s,v,t,bh1=None,bh2=None,id=id)
         
     
     def random_mass(self):
@@ -254,7 +254,6 @@ class Simulator:
         theta = np.arcsin(self.rng.random())
         xyz = np.array([np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)])
         return xyz
-    
     
         
         
