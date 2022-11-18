@@ -50,7 +50,7 @@ class BlackHole:
             if 'm' in params:
                 parstring+=f'm={round(BH.m,3)},'
             if 's' in params:
-                parstring+=f's={np.round(BH.s,3)},'
+                parstring+=f's={np.around(BH.s,3)},'
             if 's_mag' in params:
                 parstring+=f's_mag={round(np.sqrt(np.sum(np.square(BH.v))),3)},'
             if 'v' in params:

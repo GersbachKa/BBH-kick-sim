@@ -19,8 +19,11 @@ class Simulator:
         cluster_mass - The total mass of the globular cluster in solar masses [1e6]
         radius - The radius where the BH collisions happen in parsecs [2]
         imf_alpha - The alpha value for the imf dn/dm = m**(-alpha) [2.35] 
+        
         min_bh_star - Minimum mass of a star that forms a black hole in solar masses [10]
         bh_mass_frac - The fraction of the star mass that remains in the black hole [0.5]
+        use_mass_lookup - Toggle whether to use the BH mass transform from Spera & Mapelli, 2017 [True] 
+        
         min_star - The smallest star mass in the cluster in solar masses [0.8]
         max_star - The largest star mass in the cluster in solar masses [100]
          
@@ -59,7 +62,10 @@ class Simulator:
             pars.update({'max_star':100})
             if print_missing:
                 print(f"'max_star' not set, defaulting to {pars['max_star']}")
-            
+        if 'use_mass_lookup' not in params.keys():
+            pars.update({'use_mass_lookup':False})
+            if print_missing:
+                print(f"'use_mass_lookup' not set, defaulting to {pars['use_mass_lookup']}")
         if 'vel_thresh' not in params.keys():
             pars.update({'vel_thresh':0.1})
             if print_missing:
@@ -85,7 +91,7 @@ class Simulator:
                                  )
         
         self._set_mass_transform(pars['imf_alpha'],pars['min_bh_star'],
-                                 pars['bh_mass_frac'],pars['max_star'])
+                                 pars['bh_mass_frac'],pars['max_star'],pars['use_mass_lookup'])
         
         
         self.fit  = surfinBH.LoadFits('NRSur7dq4Remnant')
@@ -220,7 +226,7 @@ class Simulator:
             return 0 * self._random_uniform_sphere()
     
     
-    def _set_mass_transform(self,imf,min_bh_star,bh_mass_frac,max_star):
+    def _set_mass_transform(self,imf,min_bh_star,bh_mass_frac,max_star,use_mass_lookup):
         '''sets up the random mass generator. Uses inverse transform sampling'''
         print('Setting up analytic mass distribution. '+ 
               'This may take a while depending on your imf alpha')
@@ -229,13 +235,13 @@ class Simulator:
         p = sympy.Symbol('p',real=True)
         func = m**(-(imf-1))
         
-        min_bh_mass = bh_mass_frac*min_bh_star
-        max_bh_mass = bh_mass_frac*max_star
+        min_bh_mass = min_bh_star
+        max_bh_mass = max_star
 
         norm = sympy.integrate(func, (m, min_bh_mass, max_bh_mass))
         
         pdf = (1/norm)*m**(-(imf-1))
-        cdf = sympy.integrate(pdf,(m,5,m))
+        cdf = sympy.integrate(pdf,(m,min_bh_star,m))
         
         quantile = sympy.solvers.solve(cdf-p,m)
         
@@ -243,8 +249,14 @@ class Simulator:
             quantile = sympy.lambdify(p,quantile[0])
         except:
             quantile = sympy.lambdify(p,quantile)
-        
-        self._mass_transform = quantile
+                      
+        if use_mass_lookup:
+            func = self._make_mass_lookup()
+            mt = lambda x: float(func(quantile(x)))
+            self._mass_transform = mt
+        else:
+            mt = lambda x: bh_mass_frac*quantile(x)
+            self._mass_transform = mt
         print('Done')
         
     
@@ -255,5 +267,29 @@ class Simulator:
         xyz = np.array([np.cos(phi)*np.sin(theta), np.sin(phi)*np.sin(theta), np.cos(theta)])
         return xyz
     
+    def _make_mass_lookup(self):
+        from scipy.interpolate import interp1d
+                      
+        massLookup = np.array([
+            [8.0,1.3], 
+            [13.8,1.4], 
+            [19.5,4.0],
+            [25.2,10.7], 
+            [31.0,21.3], 
+            [36.8,33.0], 
+            [42.5,38.1], 
+            [48.2,43.2], 
+            [54.0,48.3],
+            [59.8,53.4],
+            [65.5,48.5],
+            [71.2,28.8],
+            [77.0,31.1],
+            [82.8,33.8],
+            [88.5,36.6],
+            [94.2,39.2],
+            [100.0,41.9]
+        ])
+        
+        return interp1d(massLookup[:,0],massLookup[:,1])
         
         
