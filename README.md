@@ -25,6 +25,13 @@ Once we have many generations of black holes, we can bring the population densit
 
 To tie this back to LIGO, we can use the rates of BBH mergers as a way to change our percentage densities into physical densities.
 
+Talk with Karan in last class
+compare to carnegie melon group, using GC, internal ZAMS to BH mass as a function of redshift, generic enough - looking at metallicity and hierarchical mergers, agnostic models. modular and modifiable. releasing a package - inviting future development. visual component for merger tree. Show 1-2 examples - on github. not delving into any major science statement. Every concept and everything you want to say for class paper for dump of ideas then can edit for ApJ later. Looking at max mass BH happening. relative heights in posterior. function to go through all the trees to make a list of mergers- merger rates. no time currently (relative merger rate for a single globular cluster over whole timespan of a cluster) - paper with gerosa and berti - inculded hierarchical mergers - if spins > .2 then no imbh - way to skip time argument?? subtle... apj is 3 pages - one tree look at high masses, spin info.... --- future = feed in spin PDF for priors. Prior implementation
+scope: key is hierarchical merger - user input to represent many different environments that hierarchical mergers can take place in not just GCs. 
+not as agnostic as we would like. 
+get used to holding an iphone first. see how community uses it first - see what community wants... if next year a group wants to take it on - what would they work on? mentorship update of package. 
+
+
 
 ### Some papers
 
