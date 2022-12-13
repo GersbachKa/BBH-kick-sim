@@ -74,6 +74,10 @@ class Simulator:
             pars.update({'rand_spin_type':'uniform'})
             if print_missing:
                 print(f"'rand_spin_type' not set, defaulting to {pars['rand_spin_type']}")
+                
+        if pars['use_mass_lookup']:
+            pars.update({'min_bh_star':16.2115})
+            print('Using mass lookup table. Setting the minimum BH star to 16.2115')
             
         self.sim_params = pars
             
@@ -185,10 +189,10 @@ class Simulator:
         if q<6:
             mf,chif,vf,_,_,_ = self.fit.all(q,s1,s2,allow_extrap=True)
         else:
-            #big mass ratio, use emergency fitter
+            #big mass ratio, use second fitter
             #print(f'Large mass ratio encountered: q={q}')
-            s1 = np.sqrt(np.sum(np.square(s1)))*np.array([0,0,1])
-            s2 = np.sqrt(np.sum(np.square(s2)))*np.array([0,0,1])
+            s1 = np.sqrt(np.sum(np.square(s1)))*self.rng.choice([[0,0,1],[0,0,-1]])
+            s2 = np.sqrt(np.sum(np.square(s2)))*self.rng.choice([[0,0,1],[0,0,-1]])
             mf,chif,vf,_,_,_ = self.fit2.all(q,s1,s2,allow_extrap=True)
         mf *= mtot
         vf *= 3e5
